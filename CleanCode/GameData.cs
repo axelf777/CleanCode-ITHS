@@ -47,7 +47,7 @@ namespace CleanCode
             }
             return $"{new string('B', bulls)}{new string('C', cows)}";
         }
-        public static string MakeGoalNumbers()
+        private static string MakeGoalNumbers()
         {
             Random randomGenerator = new Random();
             string goal = "";

@@ -10,7 +10,8 @@ namespace CleanCode
     {
         private readonly PlayerData _player;
         public GameEngine() {
-            _player = PlayerData.AskForPlayerName();
+            ConsoleIO consoleIO = new ConsoleIO();
+            _player = PlayerData.AskForPlayerName(consoleIO);
         }
         public void Run()
         {

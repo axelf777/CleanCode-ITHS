@@ -11,6 +11,14 @@ namespace CleanCode
         private const string FileName = "result.txt";
         public static void SavePlayerData(PlayerData player)
         {
+            if (player == null)
+            {
+                throw new ArgumentNullException("PlayerData cannot be null");
+            }
+            if (!File.Exists(FileName)) {
+                using (var fs = File.Create(FileName)) { }
+            }
+
             using (var output = new StreamWriter(FileName, append: true))
             {
                 output.WriteLine(player.Name + "|" + player.totalGuesses);

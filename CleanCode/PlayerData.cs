@@ -26,14 +26,14 @@ namespace CleanCode
             totalGuesses += guesses;
         }
 
-        public static PlayerData AskForPlayerName()
+        public static PlayerData AskForPlayerName(IUserIO io)
         {
-            Console.WriteLine("Enter a user name:");
-            string name = Console.ReadLine();
-            while (string.IsNullOrEmpty(name) || name.Length > 20 || name.Contains("|"))
+            io.Write("Enter a user name:");
+            string name = io.Read();
+            while (!IsValidName(name))
             {
-                Console.WriteLine("Please enter a valid user name:");
-                name = Console.ReadLine();
+                io.Write("Please enter a valid user name:");
+                name = io.Read();
             }
             PlayerData player = new PlayerData(name, 0);
 
@@ -55,6 +55,23 @@ namespace CleanCode
         public override int GetHashCode()
         {
             return Name.GetHashCode();
+        }
+
+        private static bool IsValidName(string name)
+        {
+            return !string.IsNullOrEmpty(name) && name.Length <= 20 && !name.Contains("|");
+        }
+    }
+
+    public class  ConsoleIO : IUserIO
+    {
+        public void Write(string message)
+        {
+            Console.WriteLine(message);
+        }
+        public string Read()
+        {
+            return Console.ReadLine();
         }
     }
 }
