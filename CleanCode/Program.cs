@@ -7,7 +7,7 @@ namespace CleanCode
     {
         static void Main(string[] args)
         {
-            GameEngine gameEngine = new GameEngine();
+            GameEngine gameEngine = new GameEngine(new ConsoleIO(), new GameData());
             gameEngine.Run();
         }
     }

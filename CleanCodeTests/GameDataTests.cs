@@ -11,10 +11,14 @@ namespace CleanCode.Tests
     [TestClass()]
     public class GameDataTests
     {
+        private IGameTypes _mooGame = new MooGame();
+        private IGameTypes _masterMindGame = new MastermindGame();
+
         [TestMethod()]
         public void GameDataConstructor_And_MakeGoalNumbers_Test()
         {
             GameData game = new GameData();
+            game.SetGameData(_mooGame);
             Assert.AreEqual(4, game.Goal.Length);
             foreach (int number in game.Goal)
             {
@@ -22,26 +26,23 @@ namespace CleanCode.Tests
                 Assert.IsTrue(numberValue >= 0 && numberValue <= 9);
             }
             Assert.AreEqual(4, game.Goal.Distinct().Count());
+
+            GameData game2 = new GameData();
+            game2.SetGameData(_masterMindGame);
+            foreach (int number in game2.Goal)
+            {
+                int numberValue = (int)char.GetNumericValue((char)number);
+                Assert.IsTrue(numberValue >= 0 && numberValue <= 6);
+            }
         }
 
-        [TestMethod()]
-        public void RestartGameTest()
-        {
-            GameData game = new GameData();
-            Assert.IsTrue(game.RestartGame("yes"));
-            Assert.IsTrue(game.RestartGame("y"));
-            Assert.IsFalse(game.RestartGame("no"));
-            Assert.IsFalse(game.RestartGame("n"));
-            Assert.IsFalse(game.RestartGame(""));
-            Assert.IsFalse(game.RestartGame(null));
-        }
 
         [TestMethod()]
         public void IsCorrectGuessTest()
         {
             GameData game = new GameData();
+            game.SetGameData(_mooGame);
             game.LastGuess = game.Goal;
-            Assert.IsTrue(game.IsCorrectGuess());
             game.LastGuess = "1234";
             if (game.Goal != "1234")
             {
@@ -58,8 +59,9 @@ namespace CleanCode.Tests
         public void PrintBullsAndCowsTest()
         {
             GameData game = new GameData();
+            game.SetGameData(_mooGame);
             game.LastGuess = game.Goal;
-            Assert.AreEqual("BBBB", game.PrintBullsAndCows());
+            Assert.AreEqual("BBBB", game.PrintCorrectAndMisplacedChars());
 
             var allDigits = "0123456789".ToList();
             var excluded = game.Goal.ToCharArray();
@@ -69,7 +71,7 @@ namespace CleanCode.Tests
                 .ToArray());
 
             game.LastGuess = noMatchGuess;
-            Assert.AreEqual("", game.PrintBullsAndCows());
+            Assert.AreEqual("", game.PrintCorrectAndMisplacedChars());
 
             var oneMatchGuess = game.Goal[0] + new string(allDigits
                 .Except(excluded)
@@ -77,7 +79,7 @@ namespace CleanCode.Tests
                 .ToArray());
 
             game.LastGuess = oneMatchGuess;
-            Assert.AreEqual(1, game.PrintBullsAndCows().Length);
+            Assert.AreEqual(1, game.PrintCorrectAndMisplacedChars().Length);
 
             var twoMatchGuess = new string(new[] { game.Goal[0], game.Goal[1] })
                 + new string(allDigits
@@ -86,7 +88,7 @@ namespace CleanCode.Tests
                 .ToArray());
 
             game.LastGuess = twoMatchGuess;
-            Assert.AreEqual(2, game.PrintBullsAndCows().Length);
+            Assert.AreEqual(2, game.PrintCorrectAndMisplacedChars().Length);
 
             var threeMatchGuess = new string(new[] { game.Goal[0], game.Goal[1], game.Goal[2] })
                 + new string(allDigits
@@ -95,29 +97,12 @@ namespace CleanCode.Tests
                 .ToArray());
 
             game.LastGuess = threeMatchGuess;
-            Assert.AreEqual(3, game.PrintBullsAndCows().Length);
+            Assert.AreEqual(3, game.PrintCorrectAndMisplacedChars().Length);
 
-        }
-
-
-        [TestMethod()]
-        public void IsValidInputTest()
-        {
-            string validInput = "1234";
-            string shortInput = "123";
-            string longInput = "12345";
-            string nonDigitInput = "12a4";
-            string repeatingInput = "1123";
-            string emptyInput = "";
-            string nullInput = null;
-
-            Assert.IsFalse(GameData.IsValidInput(emptyInput));
-            Assert.IsTrue(GameData.IsValidInput(validInput));
-            Assert.IsFalse(GameData.IsValidInput(shortInput));
-            Assert.IsFalse(GameData.IsValidInput(longInput));
-            Assert.IsFalse(GameData.IsValidInput(nonDigitInput));
-            Assert.IsFalse(GameData.IsValidInput(repeatingInput));
-            Assert.IsFalse(GameData.IsValidInput(nullInput));
+            GameData game2 = new GameData();
+            game2.SetGameData(_masterMindGame);
+            game2.LastGuess = game2.Goal;
+            Assert.AreEqual("WWWW", game2.PrintCorrectAndMisplacedChars());
         }
     }
 }

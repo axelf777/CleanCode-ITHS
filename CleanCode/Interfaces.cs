@@ -11,4 +11,24 @@ namespace CleanCode
         void Write(string message);
         string Read();
     }
+
+    public interface IGameTypes
+    {
+        int MaximumAllowedDigit { get; }
+        bool AllowDuplicates { get; }
+        string GameName { get; }
+        string Rules { get; }
+        char CorrectChar { get; }
+        char MisplacedChar { get; }
+    }
+
+    public interface IGameData
+    {
+        string Goal { get; }
+        string LastGuess { get; set; }
+        bool IsCorrectGuess();
+        string PrintCorrectAndMisplacedChars();
+        void SetGameData(IGameTypes gameType);
+
+    }
 }

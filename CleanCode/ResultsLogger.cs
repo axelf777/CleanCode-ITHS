@@ -8,55 +8,44 @@ namespace CleanCode
 {
     public static class ResultsLogger
     {
-        private const string FileName = "result.txt";
-        public static void SavePlayerData(PlayerData player)
+        public static void SavePlayerData(PlayerData player, string gameType)
         {
             if (player == null)
             {
                 throw new ArgumentNullException("PlayerData cannot be null");
             }
-            if (!File.Exists(FileName)) {
-                using (var fs = File.Create(FileName)) { }
-            }
 
-            using (var output = new StreamWriter(FileName, append: true))
+            using var db = new PlayerDbContext();
+            var existing = db.Players.FirstOrDefault(p => p.Name == player.Name && p.GameType == gameType);
+
+            if (existing != null)
             {
-                output.WriteLine(player.Name + "|" + player.totalGuesses);
+                existing.TotalGuesses += player.TotalGuesses;
+                existing.NumberOfGames ++;
+                db.Update(existing);
             }
+            else
+            {
+                PlayerModel playerModel = new PlayerModel
+                {
+                    Name = player.Name,
+                    TotalGuesses = player.TotalGuesses,
+                    NumberOfGames = 1,
+                    GameType = gameType
+                };
+                db.Players.Add(playerModel);
+            }
+            db.SaveChanges();
         }
 
-        public static List<PlayerData> RetrieveTopPlayers()
+        public static List<PlayerModel> RetrieveTopPlayers(string gameType)
         {
-            if (!File.Exists(FileName))
-            {
-                return null;
-            }
-            List<PlayerData> playerResults = new List<PlayerData>();
-            using (var input = new StreamReader(FileName))
-            {
-                string line;
-                PlayerData player;
-                while ((line = input.ReadLine()) != null)
-                {
-                    string[] nameAndScore = line.Split('|');
-                    if (nameAndScore.Length == 2 && int.TryParse(nameAndScore[1], out int guesses))
-                    {
-                        player = new PlayerData(nameAndScore[0], guesses);
-                        int doesPlayerExist = playerResults.IndexOf(player);
-
-                        if (doesPlayerExist < 0)
-                        {
-                            playerResults.Add(player);
-                        }
-                        else
-                        {
-                            playerResults[doesPlayerExist].Update(guesses);
-                        }
-                    }
-                }
-            }
-            List<PlayerData> topPlayers = playerResults.OrderBy(p => p.Average()).Take(10).ToList();
-            return topPlayers;
+            using var db = new PlayerDbContext();
+            return db.Players
+                .Where(p => p.GameType == gameType)
+                .OrderBy(p => (double)p.TotalGuesses / p.NumberOfGames)
+                .Take(10)
+                .ToList();
         }
     }
 }

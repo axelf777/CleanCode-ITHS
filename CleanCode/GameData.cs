@@ -6,71 +6,60 @@ using System.Threading.Tasks;
 
 namespace CleanCode
 {
-    public class GameData
+    public class GameData : IGameData
     {
-        public string Goal { get; private set; }
-        public string LastGuess { get; set; }
-        public GameData()
+        public string? Goal { get; private set; }
+        public string? LastGuess { get; set; }
+        private IGameTypes? _gameType;
+        public void SetGameData(IGameTypes gameType)
         {
-            Goal = MakeGoalNumbers();
+            _gameType = gameType;
             LastGuess = "";
+            Goal = MakeGoalNumbers();
         }
-        public bool RestartGame(string answer)
-        {
-            if (answer != null && answer != "" && answer.Substring(0, 1) == "y")
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+
         public bool IsCorrectGuess()
         {
             return LastGuess == Goal;
         }
 
-        public string PrintBullsAndCows()
+        public string PrintCorrectAndMisplacedChars()
         {
-            int bulls = 0, cows = 0;
+            int correct = 0, misplaced = 0;
             for (int i = 0; i < 4; i++)
             {
                 if (Goal[i] == LastGuess[i])
                 {
-                    bulls++;
+                    correct++;
                 }
                 else if (Goal.Contains(LastGuess[i]))
                 {
-                    cows++;
+                    misplaced++;
                 }
             }
-            return $"{new string('B', bulls)}{new string('C', cows)}";
+            return $"{new string(_gameType.CorrectChar, correct)}{new string(_gameType.MisplacedChar, misplaced)}";
         }
-        private static string MakeGoalNumbers()
+
+        private string MakeGoalNumbers()
         {
             Random randomGenerator = new Random();
             string goal = "";
             for (int i = 0; i < 4; i++)
             {
-                int random = randomGenerator.Next(10);
+                int random = randomGenerator.Next(_gameType.MaximumAllowedDigit);
                 string randomDigit = "" + random;
-                while (goal.Contains(randomDigit))
+                if (!_gameType.AllowDuplicates)
                 {
-                    random = randomGenerator.Next(10);
-                    randomDigit = "" + random;
+                    while (goal.Contains(randomDigit))
+                    {
+                        random = randomGenerator.Next(_gameType.MaximumAllowedDigit);
+                        randomDigit = "" + random;
+                    }
                 }
+
                 goal = goal + randomDigit;
             }
             return goal;
-        }
-
-        public static bool IsValidInput(string input)
-        {
-            return input != null
-                && input.Length == 4
-                && input.All(char.IsDigit)
-                && input.Distinct().Count() == 4;
         }
     }
 }

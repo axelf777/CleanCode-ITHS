@@ -8,64 +8,89 @@ namespace CleanCode
 {
     public class GameEngine
     {
-        private readonly PlayerData _player;
-        public GameEngine() {
-            ConsoleIO consoleIO = new ConsoleIO();
-            _player = PlayerData.AskForPlayerName(consoleIO);
+        private PlayerData? _player;
+        private IUserIO _io;
+        private IGameTypes? _gameType; 
+        private IGameData _game;
+        private InputValidatorService _inputService;
+        private PlayerSetupService _playerService;
+
+        public GameEngine(IUserIO io, IGameData gameData)
+        {
+            _io = io;
+            _game = gameData;
+            _inputService = new InputValidatorService();
+            _playerService = new PlayerSetupService(io, _inputService);
         }
+
         public void Run()
         {
+            _player = _playerService.AskForPlayerName();
             bool gameLoop = true;
             while (gameLoop)
             {
-                GameData game = new GameData();
-                Console.WriteLine("New game:\n");
-                //comment out or remove next line to play real games!
-                Console.WriteLine("For practice, number is: " + game.Goal + "\n");
+                _gameType = _playerService.AskForGameType();
+                _game.SetGameData(_gameType);
+                _io.Write($"New game of {_gameType.GameName}:\n");
+                _io.Write($"The rules are:\n{_gameType.Rules}\n");
+                if (_playerService.AskIfTheyWannaCheat())
+                {
+                    _io.Write($"For practice (;-)), number is: {_game.Goal}\n");
+                }
 
-                int guessCount = PlayOneGame(game);
+                int guessCount = PlayOneGame();
                 _player.Update(guessCount);
-                ResultsLogger.SavePlayerData(_player);
-                ShowResults();
+                ResultsLogger.SavePlayerData(_player, _gameType.GameName);
+                PrintResults();
 
-                Console.WriteLine("Do you want to play again? (y/n)");
-                string answer = Console.ReadLine();
-                gameLoop = game.RestartGame(answer);
+                _io.Write("Do you want to play again? (y/n)");
+                string answer = _io.Read();
+                _player.ResetGuesses();
+                gameLoop = _inputService.IsYesOrNo(answer);
 
             }
         }
 
-        private int PlayOneGame(GameData game)
+        private int PlayOneGame()
         {
             int guessCount = 0;
-            while (!game.IsCorrectGuess())
+            while (!_game.IsCorrectGuess())
             {
-                Console.WriteLine("Enter your guess (4 digits, no repeating):");
-                string guess = Console.ReadLine();
-                while (!GameData.IsValidInput(guess))
+                _io.Write("Enter your guess (4 digits):");
+                string guess = _io.Read();
+                while (!_inputService.IsValidInput(guess, _gameType))
                 {
-                    Console.WriteLine("Please enter a valid 4-digit number with no repeating digits:");
-                    guess = Console.ReadLine();
+                    if (!_gameType.AllowDuplicates)
+                    {
+                        _io.Write("Please enter a valid 4-digit number with no repeating digits:");
+                    }
+                    else
+                    {
+                        _io.Write("Please enter a valid 4-digit number:");
+                    }
+                    guess = _io.Read();
                 }
-                game.LastGuess = guess;
+                _game.LastGuess = guess;
                 guessCount++;
-                Console.WriteLine(game.PrintBullsAndCows());
+                _io.Write(_game.PrintCorrectAndMisplacedChars());
             }
             return guessCount;
         }
 
-        private void ShowResults()
+        private void PrintResults()
         {
-            Console.WriteLine("Congratulations! It took " + _player.totalGuesses + " guesses\n");
-            List<PlayerData> topPlayers = ResultsLogger.RetrieveTopPlayers();
+            _io.Write("Congratulations! It took " + _player.TotalGuesses + " guesses\n");
+            List<PlayerModel> topPlayers = ResultsLogger.RetrieveTopPlayers(_gameType.GameName);
             if (topPlayers != null)
             {
-                Console.WriteLine("Top Players:\n");
+                _io.Write("Top Players:\n");
                 foreach (var topPlayer in topPlayers)
                 {
-                    Console.WriteLine($"{topPlayer.Name} - {topPlayer.numberOfGames} games - {topPlayer.totalGuesses} guesses - {topPlayer.Average().ToString("F2")} average guesses");
+                    _io.Write($"{topPlayer.Name} - {topPlayer.NumberOfGames} games - {topPlayer.TotalGuesses} guesses - {topPlayer.Average().ToString("F2")} average guesses");
                 }
             }
         }
+
+       
     }
 }
