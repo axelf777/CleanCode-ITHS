@@ -1,12 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using CleanCode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CleanCode.Data;
 
-namespace CleanCode.Tests
+namespace CleanCodeTests
 {
     [TestClass()]
     public class PlayerDataTests
@@ -14,14 +14,14 @@ namespace CleanCode.Tests
         [TestMethod()]
         public void PlayerDataConstructorTest()
         {
-            PlayerData player = new PlayerData("Alice");
+            PlayerData player = new("Alice");
             Assert.AreEqual("Alice", player.Name);
         }
 
         [TestMethod()]
         public void PlayerUpdateTest()
         {
-            PlayerData player = new PlayerData("Bobber");
+            PlayerData player = new("Bobber");
             player.Update(7);
             Assert.AreEqual(7, player.TotalGuesses);
         }
@@ -29,7 +29,7 @@ namespace CleanCode.Tests
         [TestMethod()]
         public void PlayerResetGuessesTest()
         {
-            PlayerData player = new PlayerData("Charlie");
+            PlayerData player = new("Charlie");
             player.Update(5);
             player.ResetGuesses();
             Assert.AreEqual(0, player.TotalGuesses);

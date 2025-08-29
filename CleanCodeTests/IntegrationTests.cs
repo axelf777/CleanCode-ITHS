@@ -1,21 +1,23 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using CleanCode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CleanCode.Game;
+using CleanCode.Services;
+using CleanCode;
 
-namespace CleanCode.Tests
+namespace CleanCodeTests
 {
     [TestClass()]
-    public class GameEngineTests
+    public class IntegrationTests
     {
         [TestMethod()]
-        public void GameEngineConstructor_And_AskForPlayerName_ValidInput_Test()
+        public void GameLoopIntegrationTest()
         {
             // This one test basically tests everything
-            FakeUserIO fakeIO = new FakeUserIO(
+            FakeUserIO fakeIO = new(
                 "",                         // empty name
                 "SuperLongNameDefientelyWontWork", // too long
                 "|",                        // invalid character
@@ -28,8 +30,8 @@ namespace CleanCode.Tests
                 "1234",                     // correct guess
                 "n"                         // to exit
             );
-
-            GameEngine gameEngine = new GameEngine(fakeIO, new FakeGameData());
+            GameContextFactory contextFactory = new(fakeIO, new FakeGameData());
+            GameEngine gameEngine = new(contextFactory, new PlayerSetupService(fakeIO));
             gameEngine.Run();
 
             var outputs = fakeIO.Outputs;
@@ -55,58 +57,6 @@ namespace CleanCode.Tests
             Assert.IsTrue(outputs.Any(o => o.Contains("Top Players:")));
 
             Assert.IsTrue(outputs.Any(o => o.Contains("Do you want to play again?")));
-        }
-
-        internal class FakeGameData : IGameData
-        {
-            public string? Goal { get; private set; } = "1234";
-            public string? LastGuess { get; set; }
-            private IGameTypes? _gameType;
-            public void SetGameData(IGameTypes gameType)
-            {
-                _gameType = gameType;
-                LastGuess = "";
-            }
-            public bool IsCorrectGuess()
-            {
-                return LastGuess == Goal;
-            }
-            public string PrintCorrectAndMisplacedChars()
-            {
-                int correct = 0, misplaced = 0;
-                for (int i = 0; i < 4; i++)
-                {
-                    if (Goal[i] == LastGuess[i])
-                    {
-                        correct++;
-                    }
-                    else if (Goal.Contains(LastGuess[i]))
-                    {
-                        misplaced++;
-                    }
-                }
-                return $"{new string(_gameType.CorrectChar, correct)}{new string(_gameType.MisplacedChar, misplaced)}";
-            }
-        }
-        internal class FakeUserIO : IUserIO
-        {
-            private Queue<string> _inputs = new Queue<string>();
-            public List<string> Outputs = new List<string>();
-            public FakeUserIO(params string[] inputs)
-            {
-                foreach (string input in inputs)
-                {
-                    _inputs.Enqueue(input);
-                }
-            }
-            public string Read()
-            {
-                return _inputs.Dequeue();
-            }
-            public void Write(string message)
-            {
-                Outputs.Add(message);
-            }
         }
     }
 }

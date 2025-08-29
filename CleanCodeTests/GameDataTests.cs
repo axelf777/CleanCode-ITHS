@@ -1,23 +1,25 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using CleanCode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CleanCode.Data;
+using CleanCode;
+using CleanCode.Game;
 
-namespace CleanCode.Tests
+namespace CleanCodeTests
 {
     [TestClass()]
     public class GameDataTests
     {
-        private IGameTypes _mooGame = new MooGame();
-        private IGameTypes _masterMindGame = new MastermindGame();
+        private readonly IGameTypes _mooGame = new MooGame();
+        private readonly IGameTypes _masterMindGame = new MastermindGame();
 
         [TestMethod()]
         public void GameDataConstructor_And_MakeGoalNumbers_Test()
         {
-            GameData game = new GameData();
+            GameData game = new();
             game.SetGameData(_mooGame);
             Assert.AreEqual(4, game.Goal.Length);
             foreach (int number in game.Goal)
@@ -27,7 +29,7 @@ namespace CleanCode.Tests
             }
             Assert.AreEqual(4, game.Goal.Distinct().Count());
 
-            GameData game2 = new GameData();
+            GameData game2 = new();
             game2.SetGameData(_masterMindGame);
             foreach (int number in game2.Goal)
             {
@@ -40,7 +42,7 @@ namespace CleanCode.Tests
         [TestMethod()]
         public void IsCorrectGuessTest()
         {
-            GameData game = new GameData();
+            GameData game = new();
             game.SetGameData(_mooGame);
             game.LastGuess = game.Goal;
             game.LastGuess = "1234";
@@ -58,7 +60,7 @@ namespace CleanCode.Tests
         [TestMethod()]
         public void PrintBullsAndCowsTest()
         {
-            GameData game = new GameData();
+            GameData game = new();
             game.SetGameData(_mooGame);
             game.LastGuess = game.Goal;
             Assert.AreEqual("BBBB", game.PrintCorrectAndMisplacedChars());
@@ -99,7 +101,7 @@ namespace CleanCode.Tests
             game.LastGuess = threeMatchGuess;
             Assert.AreEqual(3, game.PrintCorrectAndMisplacedChars().Length);
 
-            GameData game2 = new GameData();
+            GameData game2 = new();
             game2.SetGameData(_masterMindGame);
             game2.LastGuess = game2.Goal;
             Assert.AreEqual("WWWW", game2.PrintCorrectAndMisplacedChars());

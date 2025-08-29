@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanCode
+namespace CleanCode.Services
 {
-    public class ConsoleIO : IUserIO
+    public class ConsoleIOService : IUserIO
     {
         public void Write(string message)
         {

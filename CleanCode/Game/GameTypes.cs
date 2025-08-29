@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanCode
+namespace CleanCode.Game
 {
     public class MooGame : IGameTypes
     {

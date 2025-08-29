@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanCode
+namespace CleanCode.DB
 {
     public class PlayerModel
     {
@@ -13,10 +13,5 @@ namespace CleanCode
         public int NumberOfGames { get; set; }
         public int TotalGuesses { get; set; }
         public string GameType { get; set; }
-        public double Average()
-        {
-            return (double)TotalGuesses / NumberOfGames;
-        }
-
     }
 }

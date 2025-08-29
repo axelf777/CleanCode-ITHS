@@ -1,12 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using CleanCode.Services;
 using CleanCode;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CleanCode.DB;
+using CleanCode.Data;
+using CleanCode.Game;
 
-namespace CleanCode.Tests
+namespace CleanCodeTests
 {
     [TestClass()]
     public class ResultsLoggerAndDatabaseTests
@@ -20,8 +18,8 @@ namespace CleanCode.Tests
                 context.SaveChanges();
             }
 
-            PlayerData player1 = new PlayerData("Alice");
-            PlayerData player2 = new PlayerData("Bob");
+            PlayerData player1 = new("Alice");
+            PlayerData player2 = new("Bob");
             IGameTypes mooGame = new MooGame();
             IGameTypes masterMindGame = new MastermindGame();
             player1.Update(5);

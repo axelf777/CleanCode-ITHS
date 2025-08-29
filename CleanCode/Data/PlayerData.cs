@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanCode
+namespace CleanCode.Data
 {
     public class PlayerData
     {
-        public string Name { get; private set; }
+        public string Name { get; }
         public int TotalGuesses { get; private set; }
 
         public PlayerData(string name)
         {
-            this.Name = name;
+            Name = name;
             TotalGuesses = 0;
         }
 

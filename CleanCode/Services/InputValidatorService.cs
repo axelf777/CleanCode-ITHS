@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanCode
+namespace CleanCode.Services
 {
-    public class InputValidatorService
+    public static class InputValidatorService
     {
-        public bool IsValidName(string name)
+        public static bool IsValidName(string name)
         {
-            return !string.IsNullOrEmpty(name) && name.Length <= 20 && !name.Contains("|");
+            return !string.IsNullOrEmpty(name) && name.Length <= 20 && !name.Contains('|');
         }
 
-        public bool IsValidInput(string input, IGameTypes gameType)
+        public static bool IsValidInput(string input, IGameTypes gameType)
         {
             return input != null
                 && input.Length == 4
@@ -21,7 +21,7 @@ namespace CleanCode
                 && (gameType.AllowDuplicates || input.Distinct().Count() == 4);
         }
 
-        public bool IsYesOrNo(string input)
+        public static bool IsYesOrNo(string input)
         {
             return !string.IsNullOrEmpty(input) && input.StartsWith("y", StringComparison.OrdinalIgnoreCase);
         }

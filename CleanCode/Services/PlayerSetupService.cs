@@ -1,27 +1,27 @@
-﻿using System;
+﻿using CleanCode.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using CleanCode.Game;
 
-namespace CleanCode
+namespace CleanCode.Services
 {
     public class PlayerSetupService
     {
         private readonly IUserIO _io;
-        private readonly InputValidatorService _inputService;
-        public PlayerSetupService(IUserIO io, InputValidatorService inputService )
+        public PlayerSetupService(IUserIO io )
         {
             _io = io;
-            _inputService = inputService;   
         }
 
         public PlayerData AskForPlayerName()
         {
             _io.Write("Enter a user name:");
             string name = _io.Read();
-            while (!_inputService.IsValidName(name))
+            while (!InputValidatorService.IsValidName(name))
             {
                 _io.Write("Please enter a valid user name:");
                 name = _io.Read();
@@ -46,13 +46,12 @@ namespace CleanCode
             {
                 return new MastermindGame();
             }
-            
         }
-        public bool AskIfTheyWannaCheat()
+        public bool IsCheatEnabled()
         {
             _io.Write("Do you want to cheat? (y/n)");
             string answer = _io.Read();
-            return _inputService.IsYesOrNo(answer);
+            return InputValidatorService.IsYesOrNo(answer);
         }
     }
 }

@@ -1,20 +1,17 @@
-﻿using System;
+﻿using CleanCode.Data;
+using CleanCode.DB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanCode
+namespace CleanCode.Services
 {
     public static class ResultsLogger
     {
         public static void SavePlayerData(PlayerData player, string gameType)
         {
-            if (player == null)
-            {
-                throw new ArgumentNullException("PlayerData cannot be null");
-            }
-
             using var db = new PlayerDbContext();
             var existing = db.Players.FirstOrDefault(p => p.Name == player.Name && p.GameType == gameType);
 
@@ -26,7 +23,7 @@ namespace CleanCode
             }
             else
             {
-                PlayerModel playerModel = new PlayerModel
+                PlayerModel playerModel = new()
                 {
                     Name = player.Name,
                     TotalGuesses = player.TotalGuesses,

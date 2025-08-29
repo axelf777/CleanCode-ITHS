@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanCode
+namespace CleanCode.Data
 {
     public class GameData : IGameData
     {
@@ -42,7 +42,7 @@ namespace CleanCode
 
         private string MakeGoalNumbers()
         {
-            Random randomGenerator = new Random();
+            Random randomGenerator = new();
             string goal = "";
             for (int i = 0; i < 4; i++)
             {
@@ -57,7 +57,7 @@ namespace CleanCode
                     }
                 }
 
-                goal = goal + randomDigit;
+                goal += randomDigit;
             }
             return goal;
         }
